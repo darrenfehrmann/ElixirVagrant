@@ -1,22 +1,24 @@
 - name: install elixir
   hosts: default
   sudo: True
+  vars:
+    erlang_deb: erlang-solutions_1.0_all.deb
   tasks:
     - name: install git
       apt: name=git update_cache=yes
-    - name: Check if my_package is installed
+    - name: Check if erlang_package is installed
       command: dpkg-query -W elixir
-      register: my_package_check_deb
-      failed_when: my_package_check_deb.rc > 1
-      changed_when: my_package_check_deb.rc == 1
+      register: erlang_package_check_deb
+      failed_when: erlang_package_check_deb.rc > 1
+      changed_when: erlang_package_check_deb.rc == 1
     - name: pull down erlang solutions deb package
-      get_url: url=https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb 
-               dest=/tmp/erlang-solutions_1.0_all.deb
+      get_url: url=https://packages.erlang-solutions.com/{{ erlang_deb }}
+               dest=/tmp/{{ erlang_deb }}
                mode=0666
-      when: my_package_check_deb.rc == 1
-    - name: Install my_package
-      apt: deb="/tmp/erlang-solutions_1.0_all.deb"
+      when: erlang_package_check_deb.rc == 1
+    - name: Install erlang deb package
+      apt: deb=/tmp/{{ erlang_deb }}
       sudo: true
-      when: my_package_check_deb.rc == 1
+      when: erlang_package_check_deb.rc == 1
     - name: install elixir
       apt: name=elixir update_cache=yes
